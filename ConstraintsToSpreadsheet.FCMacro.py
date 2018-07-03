@@ -71,15 +71,17 @@ __version__ = __date__
 
 import FreeCAD
 from PySide import QtCore,QtGui
+import math
 
 
 sketches=[]
 sheet = None
+window = QtGui.QApplication.activeWindow()
 def setCell(sheet,cell,value):
     sheet.set(cell,str(value))
 
 
-window = QtGui.QApplication.activeWindow()
+
 selection = FreeCADGui.Selection.getSelectionEx()
 if len(selection)<1:
     raise StandardError('Select the Sketch(es) with the named constraints and the Spreadsheet to which you wish to add the named constraints.')
@@ -121,7 +123,10 @@ for sketch in sketches:
         if con.Name:
 
             setCell(sheet,'A'+str(ii),con.Name)
-            setCell(sheet,'B'+str(ii),con.Value)
+            if con.Type == 'Angle':
+                setCell(sheet,'B'+str(ii),con.Value*180.0/math.pi)
+            else:
+                setCell(sheet,'B'+str(ii),con.Value)
             setCell(sheet,'C'+str(ii),con.Type)
 
             if con.Name in mappedSketches:
