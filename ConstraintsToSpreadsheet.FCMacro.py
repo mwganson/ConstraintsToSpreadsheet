@@ -112,21 +112,46 @@ sheet.mergeCells('A1:H1')
 setCell(sheet,'A2','name')
 setCell(sheet,'B2','value')
 setCell(sheet,'C2','type')
-setCell(sheet,'D2','sketch')
+setCell(sheet,'D2','sketches')
 
-
+mappedSketches={}
 ii=3
 for sketch in sketches:
     for con in sketch.Constraints:
         if con.Name:
+
             setCell(sheet,'A'+str(ii),con.Name)
             setCell(sheet,'B'+str(ii),con.Value)
             setCell(sheet,'C'+str(ii),con.Type)
-            setCell(sheet,'D'+str(ii),sketch.Label)
-            sheet.setAlias('B'+str(ii),con.Name)
+
+            if con.Name in mappedSketches:
+                mappedSketches[con.Name]=mappedSketches[con.Name]+','+sketch.Label
+            else:
+                mappedSketches[con.Name]=sketch.Label
+            setCell(sheet,'D'+str(ii),mappedSketches[con.Name])
+
+            try:
+                sheet.setAlias('B'+str(ii),con.Name)
+            except:
+                #presume alias already exists, so clear this row
+                setCell(sheet,'A'+str(ii),'')
+                setCell(sheet,'B'+str(ii),'')
+                setCell(sheet,'C'+str(ii),'')
+                setCell(sheet,'D'+str(ii),'')
+                ii -=1 
+
+
+
+
             sketch.setExpression('Constraints.'+con.Name, sheet.Name+'.'+con.Name)
             ii += 1
-        
+App.ActiveDocument.recompute()
+for jj in range(3,ii):
+    try:
+        rowName = sheet.get('A'+str(jj))
+        sheet.set('D'+str(jj),mappedSketches[rowName])        
+    except:
+        pass #oops
             
 
 App.ActiveDocument.recompute()
