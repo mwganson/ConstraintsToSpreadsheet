@@ -22,4 +22,4 @@ with all the sketches selected.)
 
 First step is to ensure all of your constraints are named.  Any unnamed constraint will be ignored.  Any unconstrained elements will also be ignored.
 
-<img src="constraints-to-spreadsheet-optimized.gif" alt="animated gif">
+<img src="constraints-to-spreadsheet.gif" alt="animated gif">
