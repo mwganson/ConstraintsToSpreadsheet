@@ -66,47 +66,140 @@ __title__ = "ConstraintsToSpreadsheet"
 __author__ = "TheMarkster"
 __url__ = "https://github.com/mwganson/ConstraintsToSpreadsheet"
 __Wiki__ = "https://github.com/mwganson/ConstraintsToSpreadsheet/blob/master/README.md"
-__date__ = "2018.07.03" #year.month.date
+__date__ = "2018.07.04" #year.month.date
 __version__ = __date__
 
 import FreeCAD
 from PySide import QtCore,QtGui
 import math
 
-
 sketches=[]
 sheet = None
 window = QtGui.QApplication.activeWindow()
+aliases=[]
+
+class SSHelper:
+    def __init__(self, obj):
+        obj.Proxy = self
+
+   
+    def onChanged(self, fp, prop):
+        '''Do something when a property has changed'''
+
+        if 'Hidden_' in str(prop):
+            alias = str(prop)[7:]
+            setattr(fp,alias,float(getattr(fp,str(prop))))
+            return
+        #FreeCAD.Console.PrintMessage("Change property: " + str(prop) + "\n")
+        if hasattr(sheet,str(prop)):
+            if str(prop)=='ExpressionEngine' or str(prop) == 'Label':
+                return
+            if str(sheet.get(str(prop)))==str(getattr(fp,str(prop))):
+                #FreeCAD.Console.PrintMessage('Sheet property already set: '+str(prop)+'='+str(getattr(fp,str(prop)))+'\n')
+                return
+            try:
+                setattr(sheet,str(prop),float(getattr(fp,str(prop))))
+                sheet.set(str(prop),str(getattr(fp,str(prop))))
+                setCell(sheet,str(prop),getattr(fp,str(prop)))
+            except:
+                FreeCAD.Console.PrintMessage("exception converting to float: "+str(prop)+"\n")
+
+ 
+    def execute(self, fp):
+        '''Do something when doing a recomputation, this method is mandatory'''
+        pass
+        #FreeCAD.Console.PrintMessage("Recompute Python SSHelper feature\n")
+
+
+def addSpreadsheet(sheet):
+    if hasattr(ssHelper,"Spreadsheet"):
+        setattr(ssHelper,"Spreadsheet",sheet)
+        return
+    ssHelper.addProperty("App::PropertyLink","Spreadsheet","Base","Linked spreadsheet").Spreadsheet=sheet
+    ssHelper.setEditorMode("Spreadsheet",1)#readonly
+def addAlias(alias,tip,value):
+    ssHelper.addProperty("App::PropertyFloat",str(alias),"Aliases",tip)
+    setattr(ssHelper,alias,value)
+    aliases.append(alias)
+    addHiddenAlias(alias,tip,value)
+
+def addHiddenAlias(alias,tip,value):
+    ssHelper.addProperty("App::PropertyFloat","Hidden_"+str(alias),"HiddenAliases (acting as spreadsheet observers)",tip)
+    setattr(ssHelper,alias,value)
+    ssHelper.setExpression('Hidden_'+str(alias), sheet.Label+'.'+alias)
+    aliases.append(alias)
+    ssHelper.setEditorMode('Hidden_'+str(alias),2)#hidden and readonly
+
+def removeAlias(alias):
+    ssHelper.removeProperty(alias)
+
+def removeAllAliases():
+    for prop in ssHelper.PropertiesList:
+        if prop == 'ExpressionEngine' or prop == 'Label' or prop == 'Proxy' or prop == 'Spreadsheet':
+            continue
+        removeAlias(prop)
+
+if not hasattr(App.ActiveDocument,"SSHelper"):
+    ssHelper=FreeCAD.ActiveDocument.addObject("App::FeaturePython","SSHelper")
+    SSHelper(ssHelper)
+else:
+    ssHelper=App.ActiveDocument.getObject("SSHelper")
+    removeAllAliases()
+    
+
+#addAlias("someAlias","this is some kind of alias", float(3.1415926535))
+#addAlias("some_other_alias","this is some other alias",float(3.14))
+#removeAlias("someAlias")
+
+
+
 def setCell(sheet,cell,value):
     sheet.set(cell,str(value))
 
 
 
 selection = FreeCADGui.Selection.getSelectionEx()
-if len(selection)<1:
-    raise StandardError('Select the Sketch(es) with the named constraints and the Spreadsheet to which you wish to add the named constraints.')
 
 for sel in selection:
     if 'SketchObject' in sel.TypeName:
         sketches.append(sel.Object)
     elif 'Spreadsheet' in sel.TypeName:
         sheet = sel.Object
-
+allSketches=[]
+for obj in App.ActiveDocument.Objects:
+    if 'SketchObject' in str(type(obj)):
+        allSketches.append(obj)
+if len(allSketches)>len(sketches):
+    items=["Process all sketches in the document, even unselected ones", "Only process selected sketches."]
+    item,ok = QtGui.QInputDialog.getItem(window,'Unselected sketches in document','Process unselected sketches?',items,0,False)
+    if ok:
+        if item==items[0]:
+            sketches = allSketches
+        else:
+            raise StandardError('user canceled')
+    else:
+        raise StandardError('user canceled')
 if not sheet:
-
-    items=["Create new spreadsheet","Cancel"]
+    for obj in App.ActiveDocument.Objects:
+        if 'Spreadsheet' in str(type(obj)):
+            sheet = obj
+            break
+    items=["Create new spreadsheet","Use "+sheet.Label,"Cancel"]
     item,ok = QtGui.QInputDialog.getItem(window,'No spreadsheet selected','Create new sheet?',items,0,False)
     if ok:
         if item==items[0]:
             App.activeDocument().addObject('Spreadsheet::Sheet','Spreadsheet')
             sheet = App.ActiveDocument.getObject('Spreadsheet')
+        elif item==items[1]:
+            pass #use the sheet found
         else:
             raise StandardError('user canceled')
     else:
         raise StandardError('user canceled')
     
-
+addSpreadsheet(sheet)
 sheet.clear('A1:D200')
+removeAllAliases()
 setCell(sheet,'A1','Warning: A1-D200 get reset each time the macro is run.  Place any values you do not want changed in Column E and beyond.')
 App.ActiveDocument.Spreadsheet.setForeground('A1:H1', (1.000000,0.000000,0.000000,1.000000)) #red text
 sheet.mergeCells('A1:H1')
@@ -121,7 +214,8 @@ ii=3
 for sketch in sketches:
     for con in sketch.Constraints:
         if con.Name:
-
+            if con.Name[:1]=='_':
+                continue #ignore constraint names beginning with single underscore
             setCell(sheet,'A'+str(ii),con.Name)
             if con.Type == 'Angle':
                 setCell(sheet,'B'+str(ii),con.Value*180.0/math.pi)
@@ -137,6 +231,9 @@ for sketch in sketches:
 
             try:
                 sheet.setAlias('B'+str(ii),con.Name)
+                addAlias(con.Name,con.Name,float(con.Value))
+
+
             except:
                 #presume alias already exists, so clear this row
                 setCell(sheet,'A'+str(ii),'')
