@@ -24,9 +24,9 @@ also modified in that the named constraint will now reference the spreadsheet us
 Be warned: Cells A1-D200 are reset each time the macro is run, so any values contained in any of those cells will be lost.  
 Place any user values you don't want the macro to delete in columns E, F, G, etc.
 
-<strikethrough>**ALWAYS** select **ALL** sketches you want to use with the spreadsheet when running the macro because unselected sketches 
+<strike>**ALWAYS** select **ALL** sketches you want to use with the spreadsheet when running the macro because unselected sketches 
 will be de-referenced.  (If you accidentally forget to select them all, this is easily remedied by running the macro again 
-with all the sketches selected.)</strikethrough> (Now the macro checks for unselected sketches and offers to use them, as of 2018.07.04.)
+with all the sketches selected.)</strike> (Now the macro checks for unselected sketches and offers to use them, as of 2018.07.04.)
 
 First step is to ensure all of your constraints are named.  Any unnamed constraint will be ignored.  Any unconstrained elements will also be ignored.  New to 2018.07.04: Constraint names beginning with an underscore (_) are also ignored.
 
