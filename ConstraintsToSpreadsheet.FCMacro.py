@@ -143,7 +143,8 @@ if not hasattr(App.ActiveDocument,"SSHelper"):
     ssHelper=FreeCAD.ActiveDocument.addObject("App::FeaturePython","SSHelper")
     SSHelper(ssHelper)
 else:
-    ssHelper=App.ActiveDocument.getObject("SSHelper")
+    App.ActiveDocument.removeObject("SSHelper")
+    ssHelper=App.ActiveDocument.addObject("App::FeaturePython","SSHelper")
     removeAllAliases()
     
 
@@ -217,7 +218,7 @@ ii=3
 for sketch in sketches:
     for con in sketch.Constraints:
         if con.Name:
-            if con.Name[:1]=='_':
+            if con.Name[-1:]=='_':
                 continue #ignore constraint names beginning with single underscore
             setCell(sheet,'A'+str(ii),con.Name)
             if con.Type == 'Angle':
