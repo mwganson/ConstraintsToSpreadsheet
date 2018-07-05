@@ -3,11 +3,11 @@ Adds named constraints from selected sketch(es) to spreadsheet and creates refer
 
 Changes (2018.07.05):
 <ul>
-  <li>Changed the underscore prepend to an underscore append as code to tell the macro to ignore this constraint name.  Example:  _invalidConstraintName now should be validConstraintNameIgnoredByTheMacro_.  Evidently it's okay to have underscores in constraint names, just not for the first character.</li>
+  <li>
+Changed the underscore prepend to an underscore append as code to tell the macro to ignore this constraint name.  Example:  _invalidConstraintName now should be validConstraintNameIgnoredByTheMacro_.  Evidently it's okay to have underscores in constraint names, just not for the first character.</li>
     
-    <li>This won't really affect users, but when the macro is re-run if it finds SSHelper object it temporarily deletes it, and then re-creates a new one.  This ensures everything gets reset.  (You should not rename the SSHelper object, although it is okay to delete it if you don't want/need the functionality it provides -- being able to modify spreadsheet aliases via the property tab.)
-    </li>
-  </ul>
+<li>This won't really affect users, but when the macro is re-run if it finds SSHelper object it temporarily deletes it, and then re-creates a new one.  This ensures everything gets reset.  (You should not rename the SSHelper object, although it is okay to delete it if you don't want/need the functionality it provides -- being able to modify spreadsheet aliases via the property tab.)</li>
+</ul>
 
 
 New Features (2018.07.04):
