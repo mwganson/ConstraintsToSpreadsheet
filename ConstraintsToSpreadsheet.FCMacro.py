@@ -66,7 +66,7 @@ __title__ = "ConstraintsToSpreadsheet"
 __author__ = "TheMarkster"
 __url__ = "https://github.com/mwganson/ConstraintsToSpreadsheet"
 __Wiki__ = "https://github.com/mwganson/ConstraintsToSpreadsheet/blob/master/README.md"
-__date__ = "2018.07.04" #year.month.date
+__date__ = "2018.07.05" #year.month.date
 __version__ = __date__
 
 import FreeCAD
@@ -184,15 +184,18 @@ if not sheet:
         if 'Spreadsheet' in str(type(obj)):
             sheet = obj
             break
-    items=["Create new spreadsheet","Use "+sheet.Label,"Cancel"]
+    if sheet:
+        items=["Create new spreadsheet","Use "+sheet.Label,"Cancel"]
+    else:
+        items=["Create new spreadsheet", "Cancel"]
     item,ok = QtGui.QInputDialog.getItem(window,'No spreadsheet selected','Create new sheet?',items,0,False)
     if ok:
         if item==items[0]:
             App.activeDocument().addObject('Spreadsheet::Sheet','Spreadsheet')
             sheet = App.ActiveDocument.getObject('Spreadsheet')
-        elif item==items[1]:
+        elif item==items[1] and sheet:
             pass #use the sheet found
-        else:
+        elif item==items[1] and not sheet:
             raise StandardError('user canceled')
     else:
         raise StandardError('user canceled')
