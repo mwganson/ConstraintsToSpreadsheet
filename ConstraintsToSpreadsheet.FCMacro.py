@@ -95,9 +95,10 @@ class SSHelper:
             if str(prop)=='ExpressionEngine' or str(prop) == 'Label':
                 return
             if str(sheet.get(str(prop)))==str(getattr(fp,str(prop))):
-                #FreeCAD.Console.PrintMessage('Sheet property already set: '+str(prop)+'='+str(getattr(fp,str(prop)))+'\n')
+                FreeCAD.Console.PrintMessage('Sheet property already set: '+str(prop)+'='+str(getattr(fp,str(prop)))+'\n')
                 return
             try:
+                FreeCAD.Console.PrintMessage('Setting Sheet property: '+str(prop)+' to: '+str(getattr(fp,str(prop)))+'\n')
                 setattr(sheet,str(prop),float(getattr(fp,str(prop))))
                 sheet.set(str(prop),str(getattr(fp,str(prop))))
                 setCell(sheet,str(prop),getattr(fp,str(prop)))
@@ -145,6 +146,7 @@ if not hasattr(App.ActiveDocument,"SSHelper"):
 else:
     App.ActiveDocument.removeObject("SSHelper")
     ssHelper=App.ActiveDocument.addObject("App::FeaturePython","SSHelper")
+    SSHelper(ssHelper)
     removeAllAliases()
     
 
