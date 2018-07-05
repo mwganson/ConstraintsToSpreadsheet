@@ -1,6 +1,15 @@
 # ConstraintsToSpreadsheet
 Adds named constraints from selected sketch(es) to spreadsheet and creates references.
 
+Changes (2018.07.05):
+<ul>
+  <li>Changed the underscore prepend to an underscore append as code to tell the macro to ignore this constraint name.  Example:  _invalidConstraintName now should be validConstraintNameIgnoredByTheMacro_.  Evidently it's okay to have underscores in constraint names, just not for the first character.
+    
+    <li>This won't really affect users, but when the macro is re-run if it finds SSHelper object it temporarily deletes it, and then re-creates a new one.  This ensures everything gets reset.  (You should not rename the SSHelper object, although it is okay to delete it if you don't want/need the functionality it provides -- being able to modify spreadsheet aliases via the property tab.)
+    </li>
+  </ul>
+
+
 New Features (2018.07.04):
 <ul>
 <li>Added SSHelper FeaturePython object to document tree, can be used to edit spreadsheet aliases via the SSHelper data tab in the combo view.</li>
@@ -28,6 +37,6 @@ Place any user values you don't want the macro to delete in columns E, F, G, etc
 will be de-referenced.  (If you accidentally forget to select them all, this is easily remedied by running the macro again 
 with all the sketches selected.)</strike> (Now the macro checks for unselected sketches and offers to use them, as of 2018.07.04.)
 
-First step is to ensure all of your constraints are named.  Any unnamed constraint will be ignored.  Any unconstrained elements will also be ignored.  New to 2018.07.04: Constraint names beginning with an underscore (_) are also ignored.
+First step is to ensure all of your constraints are named.  Any unnamed constraint will be ignored.  Any unconstrained elements will also be ignored.  New to 2018.07.04: <strike>Constraint names beginning with an underscore (_) are also ignored.</strike> Constraint names ending with an underscore (_) are also ignored.
 
 <img src="constraints-to-spreadsheet.gif" alt="animated gif">
