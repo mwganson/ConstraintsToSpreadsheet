@@ -66,7 +66,7 @@ __title__ = "ConstraintsToSpreadsheet"
 __author__ = "TheMarkster"
 __url__ = "https://github.com/mwganson/ConstraintsToSpreadsheet"
 __Wiki__ = "https://github.com/mwganson/ConstraintsToSpreadsheet/blob/master/README.md"
-__date__ = "2018.07.05" #year.month.date
+__date__ = "2018.07.05b" #year.month.date
 __version__ = __date__
 
 import FreeCAD
