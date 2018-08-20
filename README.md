@@ -15,7 +15,7 @@ What it does: The macro will look for named constraints (except for constraint n
 
 Columns A through D are used.  If you plan to run the macro more than once, be advised any and all values in columns A through D get clobbered each time the macro is run.  DO NOT put your own cell values in columns A through D if you plan to run the macro again to update and add more named constraints to it.  Add your own cells to columns E, F, G, H, etc.  The macro will not modify those columns, only columns A through D get modified by the macro.
 
-
+<img src="constraints-to-spreadsheet.gif" alt="animated gif">
 
 
 
